@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NekiIt.Proto", "NekiIt.Proto\NekiIt.Proto.csproj", "{F7500607-1B35-4F3E-9195-C2FF715C8B17}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|ARM.ActiveCfg = Debug|ARM
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|ARM.Build.0 = Debug|ARM
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|ARM.Deploy.0 = Debug|ARM
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|x64.ActiveCfg = Debug|x64
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|x64.Build.0 = Debug|x64
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|x64.Deploy.0 = Debug|x64
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|x86.ActiveCfg = Debug|x86
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|x86.Build.0 = Debug|x86
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Debug|x86.Deploy.0 = Debug|x86
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|ARM.ActiveCfg = Release|ARM
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|ARM.Build.0 = Release|ARM
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|ARM.Deploy.0 = Release|ARM
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|x64.ActiveCfg = Release|x64
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|x64.Build.0 = Release|x64
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|x64.Deploy.0 = Release|x64
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|x86.ActiveCfg = Release|x86
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|x86.Build.0 = Release|x86
+		{F7500607-1B35-4F3E-9195-C2FF715C8B17}.Release|x86.Deploy.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
