@@ -3,6 +3,8 @@ using MicroPos.Core.Authorization;
 using Pinpad.Sdk.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using Windows.UI.Xaml;
 
 namespace NekiIt.Proto.Laundry
 {
@@ -18,11 +20,11 @@ namespace NekiIt.Proto.Laundry
 
             // Constrói as mensagens que serão apresentadas na tela do pinpad:
             DisplayableMessages pinpadMessages = new DisplayableMessages();
-            pinpadMessages.ApprovedMessage = "Approved";
-            pinpadMessages.DeclinedMessage = "Declined";
-            pinpadMessages.InitializationMessage = "Ola";
+            pinpadMessages.ApprovedMessage = "Aprovada";
+            pinpadMessages.DeclinedMessage = "Declinada";
+            pinpadMessages.InitializationMessage = "Inicializando";
             pinpadMessages.MainLabel = "Laundromat";
-            pinpadMessages.ProcessingMessage = "Just a sec...";
+            pinpadMessages.ProcessingMessage = "Processando...";
 
             this.Authorizer = DeviceProvider.ActivateAndGetOneOrFirst("407709482", pinpadMessages);
 
@@ -38,21 +40,26 @@ namespace NekiIt.Proto.Laundry
                 transaction.CaptureTransaction = true;
 
                 IAuthorizationReport authorizationReport = this.Authorizer.Authorize(transaction);
-
+                
                 if (authorizationReport.WasApproved == true)
                 {
+                    Debug.WriteLine("ATK: {0}, Valor: {1}", authorizationReport.AcquirerTransactionKey, 
+                        authorizationReport.Amount);
+
                     this.TurnMachineOn(option, time);
-                    this.PrompToContinue(string.Empty);
+                    continueLooping = this.PrompToContinue(string.Empty);
                     this.Transactions.Add(authorizationReport);
                 }
                 else
                 {
-                    continueLooping = this.PrompToContinue("Não autorizada");
+                    continueLooping = this.PrompToContinue("Nao autorizada.");
                 }
             }
             while (continueLooping == true);
 
             this.CancelTransactions();
+            this.Authorizer.PinpadFacade.Communication.ClosePinpadConnection(pinpadMessages.MainLabel);
+            Application.Current.Exit();
         }
 
         private void CancelTransactions()
@@ -78,11 +85,11 @@ namespace NekiIt.Proto.Laundry
                     DisplayPaddingType.Center);
             }
 
-            await System.Threading.Tasks.Task.Delay(3000);
+            System.Threading.Tasks.Task.Delay(3000).Wait();
         }
         private bool PrompToContinue(string label)
         {
-            this.Authorizer.PinpadFacade.Display.ShowMessage(label, "Deseja continuar?", 
+            this.Authorizer.PinpadFacade.Display.ShowMessage(label, "Continuar?", 
                 DisplayPaddingType.Center);
 
             PinpadKeyCode key;
@@ -119,6 +126,9 @@ namespace NekiIt.Proto.Laundry
                     .GetValueInOptions("TEMPO EM MINUTOS", 15, 30, 45, 60);
             }
             while (time == null);
+
+            this.Authorizer.PinpadFacade.Display.ShowMessage("Processando...", string.Empty, 
+                DisplayPaddingType.Center);
 
             return (time.HasValue == true) ? time.Value : (short) 0;
         }
