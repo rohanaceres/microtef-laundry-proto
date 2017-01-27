@@ -18,9 +18,10 @@ namespace NekiIt.Proto
         {
             this.InitializeComponent();
         }
-
+        
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            // Turn laundry on:
             LaundryService service = new LaundryService();
             service.StartMachine();
         }

@@ -8,12 +8,24 @@ using Windows.UI.Xaml;
 
 namespace NekiIt.Proto.Laundry
 {
-    // TODO: Doc
+    /// <summary>
+    /// Responsible for simulating the laundry workflow.
+    /// </summary>
     internal sealed class LaundryService
     {
+        /// <summary>
+        /// Responsible for access pinpad features, authoriza and cancel transactions.
+        /// </summary>
         public ICardPaymentAuthorizer Authorizer { get; private set; }
+        /// <summary>
+        /// Collection of approved transactions.
+        /// </summary>
         private List<IAuthorizationReport> Transactions { get; set; } = new List<IAuthorizationReport>();
 
+        /// <summary>
+        /// Start the main flow of reading laundry options and performing a transaction
+        /// with the corresponding amount.
+        /// </summary>
         public void StartMachine()
         {
             MicroPos.Platform.Uwp.CrossPlatformUwpInitializer.Initialize();
@@ -62,6 +74,10 @@ namespace NekiIt.Proto.Laundry
             Application.Current.Exit();
         }
 
+        /// <summary>
+        /// Cancel approved transactions at the end of the laundry workflow.
+        /// All <see cref="Transactions"/> are cancelled.
+        /// </summary>
         private void CancelTransactions()
         {
             foreach (IAuthorizationReport currentTransaction in this.Transactions)
@@ -69,8 +85,12 @@ namespace NekiIt.Proto.Laundry
                 this.Authorizer.Cancel(currentTransaction.AcquirerTransactionKey, currentTransaction.Amount);
             }
         }
-
-        private async void TurnMachineOn(LaundryOptionCode option, short time)
+        /// <summary>
+        /// Simulates turning on a wash or dry machine.
+        /// </summary>
+        /// <param name="option">Laundry option.</param>
+        /// <param name="time">Time to wash or dry clothes.</param>
+        private void TurnMachineOn(LaundryOptionCode option, short time)
         {
             if (option == LaundryOptionCode.Dry)
             {
@@ -87,6 +107,11 @@ namespace NekiIt.Proto.Laundry
 
             System.Threading.Tasks.Task.Delay(3000).Wait();
         }
+        /// <summary>
+        /// Show a message and prompt for the user to confirm or decline.
+        /// </summary>
+        /// <param name="label">Label to present at the first line of pinpad display.</param>
+        /// <returns>Returns the user input.</returns>
         private bool PrompToContinue(string label)
         {
             this.Authorizer.PinpadFacade.Display.ShowMessage(label, "Continuar?", 
@@ -104,6 +129,10 @@ namespace NekiIt.Proto.Laundry
         }
 
         // getters
+        /// <summary>
+        /// Reads the laundry option, that is, if the user wants to use the wash or dry machine.
+        /// </summary>
+        /// <returns>The laundry option input by the user.</returns>
         private LaundryOptionCode GetOption()
         {
             // Read option:
@@ -117,6 +146,10 @@ namespace NekiIt.Proto.Laundry
 
             return option.ToLaundryOptionCode();
         }
+        /// <summary>
+        /// Reads the time to wash or dry clothes.
+        /// </summary>
+        /// <returns>The time input by the user.</returns>
         private short GetTime()
         {
             Nullable<short> time;
@@ -132,6 +165,13 @@ namespace NekiIt.Proto.Laundry
 
             return (time.HasValue == true) ? time.Value : (short) 0;
         }
+        /// <summary>
+        /// Get transaction amount based on a combination of the laundry option
+        /// (wash or dry) and the time the machine will be working.
+        /// </summary>
+        /// <param name="option">Laundry option.</param>
+        /// <param name="time">Time to wash or dry clothes.</param>
+        /// <returns>The transaction amount.</returns>
         private decimal GetAmount(LaundryOptionCode option, short time)
         {
             return ((int)option) + time / 10;
