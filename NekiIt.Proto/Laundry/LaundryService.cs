@@ -4,6 +4,7 @@ using Pinpad.Sdk.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 
 namespace NekiIt.Proto.Laundry
@@ -26,7 +27,7 @@ namespace NekiIt.Proto.Laundry
         /// Start the main flow of reading laundry options and performing a transaction
         /// with the corresponding amount.
         /// </summary>
-        public void StartMachine()
+        public async void StartMachine()
         {
             MicroPos.Platform.Uwp.CrossPlatformUwpInitializer.Initialize();
 
@@ -44,18 +45,47 @@ namespace NekiIt.Proto.Laundry
 
             do
             {
+                // Get laundry option:
                 LaundryOptionCode option = this.GetOption();
-                short time = this.GetTime();
 
+                // Get option duration:
+                short time = 0;
+
+                // Get duration only on dry option. Otherwise, the wash time
+                // is set by it's own keyboard.
+                if (option == LaundryOptionCode.Dry)
+                {
+                    time = this.GetTime();
+                }
+
+                // Setup a new transact
                 ITransactionEntry transaction = new TransactionEntry();
                 transaction.Amount = this.GetAmount(option, time);
                 transaction.CaptureTransaction = true;
 
+                // Ask for transaction confirmation:
+                bool confirmation = this.AskForConfirmation(option, time);
+
+                if (confirmation == false)
+                {
+                    this.Authorizer.PinpadFacade.Display
+                        .ShowMessage("Operacao", "cancelada", DisplayPaddingType.Center);
+                    await Task.Delay(2000);
+                    continueLooping = true;
+                    continue;
+                }
+                else
+                {
+                    this.Authorizer.PinpadFacade.Display
+                        .ShowMessage("Carregando...", null, DisplayPaddingType.Center);
+                }
+
+                // Initiate transaction:
                 IAuthorizationReport authorizationReport = this.Authorizer.Authorize(transaction);
-                
+
                 if (authorizationReport.WasApproved == true)
                 {
-                    Debug.WriteLine("ATK: {0}, Valor: {1}", authorizationReport.AcquirerTransactionKey, 
+                    Debug.WriteLine("ATK: {0}, Valor: {1}", authorizationReport.AcquirerTransactionKey,
                         authorizationReport.Amount);
 
                     this.TurnMachineOn(option, time);
@@ -64,7 +94,7 @@ namespace NekiIt.Proto.Laundry
                 }
                 else
                 {
-                    continueLooping = this.PrompToContinue("Nao autorizada.");
+                    continueLooping = this.PrompToContinue("Nao autorizada");
                 }
             }
             while (continueLooping == true);
@@ -127,6 +157,31 @@ namespace NekiIt.Proto.Laundry
 
             return key == PinpadKeyCode.Return;
         }
+        // TODO: Doc
+        private bool AskForConfirmation(LaundryOptionCode option, short time)
+        {
+            if (option == LaundryOptionCode.Dry)
+            {
+                this.Authorizer.PinpadFacade.Display.ShowMessage("Confirma SECAGEM",
+                    string.Format("Por {0}min?", time), DisplayPaddingType.Center);
+            }
+            else
+            {
+                this.Authorizer.PinpadFacade.Display.ShowMessage("Confirma LAVAGEM", "?",
+                    DisplayPaddingType.Center);
+            }
+
+            PinpadKeyCode confirmation;
+            do
+            {
+                confirmation = this.Authorizer.PinpadFacade.Keyboard
+                    .GetKey();
+            }
+            while (confirmation != PinpadKeyCode.Return &&
+                   confirmation != PinpadKeyCode.Cancel);
+
+            return (confirmation == PinpadKeyCode.Cancel) ? false : true;
+        }
 
         // getters
         /// <summary>
@@ -156,7 +211,7 @@ namespace NekiIt.Proto.Laundry
             do
             {
                 time = this.Authorizer.PinpadFacade.Keyboard.DataPicker
-                    .GetValueInOptions("TEMPO EM MINUTOS", 15, 30, 45, 60);
+                    .GetValueInOptions("TEMPO EM MINUTOS", 15, 30, 45);
             }
             while (time == null);
 

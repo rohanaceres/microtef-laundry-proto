@@ -35,7 +35,7 @@
         {
             switch (self)
             {
-                case "LAVAGEL":
+                case "LAVAGEM":
                     return LaundryOptionCode.Wash;
                 case "SECAGEM":
                     return LaundryOptionCode.Dry;
