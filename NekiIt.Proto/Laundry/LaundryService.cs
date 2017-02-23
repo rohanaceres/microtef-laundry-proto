@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Windows.Devices.Gpio;
 using Windows.UI.Xaml;
 
 namespace NekiIt.Proto.Laundry
@@ -22,6 +23,8 @@ namespace NekiIt.Proto.Laundry
         /// Collection of approved transactions.
         /// </summary>
         private List<IAuthorizationReport> Transactions { get; set; } = new List<IAuthorizationReport>();
+        // TODO: Doc
+        private Machine[] Machines = { new Machine("WASH MACHINE", 2), new Machine("DRY MACHINE", 3) };
 
         /// <summary>
         /// Start the main flow of reading laundry options and performing a transaction
@@ -45,6 +48,12 @@ namespace NekiIt.Proto.Laundry
 
             do
             {
+                // Turn down LEDS:
+                foreach (Machine currentMachine in this.Machines)
+                {
+                    currentMachine.TurnOff();
+                }
+
                 // Get laundry option:
                 LaundryOptionCode option = this.GetOption();
 
@@ -103,7 +112,7 @@ namespace NekiIt.Proto.Laundry
             this.Authorizer.PinpadFacade.Communication.ClosePinpadConnection(pinpadMessages.MainLabel);
             Application.Current.Exit();
         }
-
+        
         /// <summary>
         /// Cancel approved transactions at the end of the laundry workflow.
         /// All <see cref="Transactions"/> are cancelled.
@@ -130,12 +139,12 @@ namespace NekiIt.Proto.Laundry
             }
             else
             {
-                this.Authorizer.PinpadFacade.Display.ShowMessage("LAVADORA LIGADA",
-                    string.Format("POR {0} MINUTOS", time),
+                this.Authorizer.PinpadFacade.Display.ShowMessage("LAVADORA LIGADA", null,
                     DisplayPaddingType.Center);
             }
 
-            System.Threading.Tasks.Task.Delay(3000).Wait();
+            this.Machines[(int)option - 1].TurnOn();
+            Task.Delay(3000).Wait();
         }
         /// <summary>
         /// Show a message and prompt for the user to confirm or decline.

@@ -98,6 +98,7 @@
     </Compile>
     <Compile Include="Laundry\LaundryOptionCode.cs" />
     <Compile Include="Laundry\LaundryService.cs" />
+    <Compile Include="Laundry\Machine.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
