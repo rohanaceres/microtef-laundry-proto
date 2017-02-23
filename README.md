@@ -1,4 +1,4 @@
-# Laundry prototype
+﻿# Laundry prototype
 
 Protótipo de vendas seguindo um _workflow_ de lavanderia, utilizado em um **Raspberry Pi 2, modelo B**.
 
@@ -7,6 +7,10 @@ Protótipo de vendas seguindo um _workflow_ de lavanderia, utilizado em um **Ras
 ### Workflow
 
 ![Workflow](Images/workflow.png)
+
+### Circuito utilizado
+
+![Eletronic Circuit](Images/circuit.png)
 
 ## Dependências
 
